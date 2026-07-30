@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>おかねの保健室｜相談予約アプリ</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          pink: {
+            50: '#fff5f7', 100: '#ffe9ee', 200: '#ffd3dd', 300: '#ffb3c4',
+            400: '#ff8fa8', 500: '#f96d8e', 600: '#e85678'
+          },
+          mint: {
+            50: '#f2fbf6', 100: '#dff5e8', 200: '#c1ecd3', 300: '#9adfbb',
+            400: '#6fcd9e', 500: '#4ab381'
+          },
+          cream: {
+            50: '#fffdf9', 100: '#fdf6ec', 200: '#f9ecd9', 300: '#f2ddbe'
+          }
+        },
+        fontFamily: {
+          sans: ['"Hiragino Maru Gothic ProN"', '"Hiragino Kaku Gothic ProN"', '"Yu Gothic"', 'sans-serif']
+        },
+        boxShadow: {
+          soft: '0 10px 30px -12px rgba(233, 99, 138, 0.25)',
+          card: '0 4px 20px -4px rgba(0,0,0,0.08)'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  html, body { background: #fdf6ec; }
+  body { -webkit-tap-highlight-color: transparent; }
+  .app-frame { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; background: linear-gradient(180deg,#fff5f7 0%, #fdf6ec 40%, #f2fbf6 100%); }
+  .page { display: none; animation: fadeIn .35s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn .3s ease; }
+
+  .tab-btn.active-tab { color: #e85678; }
+  .tab-btn.active-tab .tab-icon-wrap { background: #ffe9ee; }
+
+  .soft-card { background: #fff; border-radius: 24px; box-shadow: 0 4px 20px -4px rgba(0,0,0,0.06); }
+
+  .pulse-dot { animation: pulse-soft 2.2s infinite; }
+  @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #ffd3dd; border-radius: 10px; }
+
+  .slot-btn.selected { background: #f96d8e !important; color: white !important; border-color: #f96d8e !important; }
+  .slot-btn.taken { background: #f3f3f3; color: #bbb; text-decoration: line-through; cursor: not-allowed; }
+  .date-card.selected { border-color: #f96d8e; background: #fff5f7; box-shadow: 0 4px 14px -4px rgba(233,99,138,0.35); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(60,40,45,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+
+  .toggle-chip.selected { background: #4ab381; color: #fff; border-color: #4ab381; }
+
+  input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 3px rgba(249,109,142,0.25); }
+
+  .admin-secret { opacity: .35; }
+</style>
+</head>
+<body class="font-sans text-stone-700">
+
+<div class="app-frame shadow-2xl pb-28">
+
+  <!-- ============ HEADER ============ -->
+  <header class="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-pink-100 px-5 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-300 to-pink-400 flex items-center justify-center shadow-sm">
+        <i data-lucide="heart-handshake" class="w-5 h-5 text-white"></i>
+      </div>
+      <div class="leading-tight">
+        <p class="text-[15px] font-bold text-stone-700">おかねの保健室</p>
+        <p class="text-[10px] text-stone-400">売らない・教える、お金の相談室</p>
+      </div>
+    </div>
+    <button id="secretBtn" class="admin-secret w-7 h-7 flex items-center justify-center text-stone-300" aria-label="admin">
+      <i data-lucide="stethoscope" class="w-4 h-4"></i>
+    </button>
+  </header>
+
+  <!-- ============ PAGE: HOME ============ -->
+  <main id="page-home" class="page active px-5 pt-5 space-y-6">
+
+    <!-- Hero -->
+    <section class="soft-card p-6 text-center relative overflow-hidden">
+      <div class="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-mint-100 opacity-70"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-pink-100 opacity-70"></div>
+      <div class="relative">
+        <div class="w-16 h-16 mx-auto rounded-full bg-pink-50 flex items-center justify-center mb-3 ring-4 ring-pink-100">
+          <i data-lucide="piggy-bank" class="w-8 h-8 text-pink-500"></i>
+        </div>
+        <h1 class="text-lg font-bold text-stone-700 leading-relaxed">
+          「NISAも iDeCoも<br>よくわからない…」
+        </h1>
+        <p class="mt-2 text-sm text-stone-500 leading-relaxed">
+          そのお悩み、ここで大丈夫。<br>
+          元教員のFPが、"わかるまで"寄り添います。
+        </p>
+        <button onclick="goToPage('reserve')" class="mt-5 w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-full shadow-soft transition active:scale-95">
+          かんたん予約をする
+        </button>
+      </div>
+    </section>
+
+    <!-- Empathy list -->
+    <section class="soft-card p-5">
+      <h2 class="text-sm font-bold text-stone-600 mb-3 flex items-center gap-1.5">
+        <i data-lucide="ear" class="w-4 h-4 text-pink-400"></i>
+        こんな不安、ありませんか？
+      </h2>
+      <ul class="space-y-2.5">
+        <li class="flex items-start gap-2.5 text-[13px] text-stone-600">
+          <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-cream-200 flex items-center justify-center text-[11px]">💭</span>
+          NISAとiDeCo、違いも始め方もわからない
+        </li>
+        <li class="flex items-start gap-2.5 text-[13px] text-stone-600">
+          <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-cream-200 flex items-center justify-center text-[11px]">💭</span>
+          保険の見直し、誰に聞けばいいか分からない
+        </li>
+        <li class="flex items-start gap-2.5 text-[13px] text-stone-600">
+          <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-cream-200 flex items-center justify-center text-[11px]">💭</span>
+          銀行や証券会社の窓口だと、勧誘されそうで怖い
+        </li>
+        <li class="flex items-start gap-2.5 text-[13px] text-stone-600">
+          <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-cream-200 flex items-center justify-center text-[11px]">💭</span>
+          将来のお金、漠然とした不安がある
+        </li>
+      </ul>
+    </section>
+
+    <!-- Concept -->
+    <section class="soft-card p-5 bg-gradient-to-br from-mint-50 to-white">
+      <h2 class="text-sm font-bold text-stone-600 mb-1 flex items-center gap-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-mint-500"></i>
+        おかねの保健室のお約束
+      </h2>
+      <p class="text-lg font-bold text-mint-600 mt-1 mb-3">売らない。教えるだけ。</p>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="bg-white rounded-2xl p-3 shadow-sm">
+          <i data-lucide="ban" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
+          <p class="text-[11px] text-stone-500 leading-tight">商品の<br>販売なし</p>
+        </div>
+        <div class="bg-white rounded-2xl p-3 shadow-sm">
+          <i data-lucide="megaphone-off" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
+          <p class="text-[11px] text-stone-500 leading-tight">しつこい<br>勧誘なし</p>
+        </div>
+        <div class="bg-white rounded-2xl p-3 shadow-sm">
+          <i data-lucide="graduation-cap" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
+          <p class="text-[11px] text-stone-500 leading-tight">元教員の<br>丁寧解説</p>
+        </div>
+      </div>
+      <p class="text-[12px] text-stone-500 mt-3 leading-relaxed">
+        特定の金融機関に属さない独立系FPだから、特定の商品をおすすめすることはありません。学校の先生のように、あなたの疑問を「わかった！」に変えることだけを大切にしています。
+      </p>
+    </section>
+
+    <!-- Profile -->
+    <section class="soft-card p-5">
+      <h2 class="text-sm font-bold text-stone-600 mb-3 flex items-center gap-1.5">
+        <i data-lucide="user-round" class="w-4 h-4 text-pink-400"></i>
+        担当のご紹介
+      </h2>
+      <div class="flex gap-3 items-center">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-pink-200 to-mint-200 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <i data-lucide="smile" class="w-7 h-7 text-white"></i>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-stone-700">丸岡 香菜<span class="ml-1.5 text-[11px] font-normal text-stone-400">独立系ファイナンシャルプランナー</span></p>
+          <p class="text-[12px] text-stone-500 leading-relaxed mt-1">
+            元・中学校保健体育科教員。「難しい言葉を、やさしい言葉に翻訳する」のが得意です。数字が苦手な方こそ、安心してお越しください。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info card -->
+    <section class="soft-card p-5 space-y-4">
+      <h2 class="text-sm font-bold text-stone-600 flex items-center gap-1.5">
+        <i data-lucide="info" class="w-4 h-4 text-pink-400"></i>
+        開室のご案内
+      </h2>
+
+      <div class="flex gap-3">
+        <div class="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="calendar-days" class="w-4 h-4 text-pink-500"></i>
+        </div>
+        <div>
+          <p class="text-[12px] text-stone-400">開室日時</p>
+          <p class="text-sm font-semibold text-stone-700">毎月 第1・第3火曜日　11:00〜16:00</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <div class="w-9 h-9 rounded-xl bg-mint-50 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="map-pin" class="w-4 h-4 text-mint-500"></i>
+        </div>
+        <div>
+          <p class="text-[12px] text-stone-400">アクセス</p>
+          <p class="text-sm font-semibold text-stone-700">大阪府茨木市元町 商店街内</p>
+          <p class="text-[11px] text-stone-400">まつげサロンと同じ建物の2階です</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cream-200 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="wallet" class="w-4 h-4 text-amber-600"></i>
+        </div>
+        <div class="w-full">
+          <p class="text-[12px] text-stone-400">料金（1回・60分）</p>
+          <div class="flex justify-between items-center mt-1 text-sm">
+            <span class="text-stone-600">一般</span>
+            <span class="font-bold text-stone-700">2,000円</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-stone-600">マツエクをご利用の方</span>
+            <span class="font-bold text-pink-500">1,500円</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <button onclick="goToPage('reserve')" class="w-full bg-mint-500 hover:bg-mint-600 text-white font-bold py-3.5 rounded-full shadow-soft transition active:scale-95 flex items-center justify-center gap-2">
+      <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+      予約フォームへ進む
+    </button>
+
+    <p class="text-center text-[11px] text-stone-400 pb-2">
+      ※特定の金融商品のご案内・販売、将来の利益を保証するご案内は一切行っておりません。
+    </p>
+  </main>
+
+  <!-- ============ PAGE: RESERVE ============ -->
+  <main id="page-reserve" class="page px-5 pt-5 space-y-5">
+
+    <!-- Step indicator -->
+    <div class="flex items-center justify-between px-2">
+      <div class="flex flex-col items-center gap-1 flex-1" id="stepIndicator1">
+        <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-pink-500 text-white">1</div>
+        <span class="text-[10px] text-stone-500">日時選択</span>
+      </div>
+      <div class="h-[2px] flex-1 bg-pink-100 -mt-4" id="stepLine1"></div>
+      <div class="flex flex-col items-center gap-1 flex-1" id="stepIndicator2">
+        <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-stone-200 text-stone-400">2</div>
+        <span class="text-[10px] text-stone-400">お客様情報</span>
+      </div>
+      <div class="h-[2px] flex-1 bg-pink-100 -mt-4" id="stepLine2"></div>
+      <div class="flex flex-col items-center gap-1 flex-1" id="stepIndicator3">
+        <div class="step-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-stone-200 text-stone-400">3</div>
+        <span class="text-[10px] text-stone-400">確認</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: date/time -->
+    <div id="resStep1" class="step active space-y-4">
+      <section class="soft-card p-5">
+        <h2 class="text-sm font-bold text-stone-600 mb-3 flex items-center gap-1.5">
+          <i data-lucide="calendar-days" class="w-4 h-4 text-pink-400"></i>
+          ① 開室日をえらぶ
+        </h2>
+        <p id="availabilityStatus" class="text-[11px] text-mint-500 mb-2 hidden"></p>
+        <div id="dateList" class="grid grid-cols-2 gap-2"></div>
+        <div class="mt-4 pt-3 border-t border-stone-100 text-center">
+          <p class="text-[11px] text-stone-400 mb-1.5">ご希望の日程が見当たらない場合は</p>
+          <button type="button" onclick="openInquiryModal()" class="text-[12px] font-bold text-pink-500 underline underline-offset-2">
+            希望日を相談する
+          </button>
+        </div>
+      </section>
+
+      <section class="soft-card p-5">
+        <h2 class="text-sm font-bold text-stone-600 mb-3 flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-4 h-4 text-pink-400"></i>
+          ② 時間帯をえらぶ
+        </h2>
+        <p id="slotHint" class="text-[12px] text-stone-400 mb-2">先に日にちを選んでください</p>
+        <div id="slotList" class="grid grid-cols-1 gap-2"></div>
+      </section>
+
+      <button onclick="goStep(2)" id="toStep2Btn" disabled class="w-full bg-stone-200 text-stone-400 font-bold py-3.5 rounded-full transition">
+        つぎへ進む
+      </button>
+    </div>
+
+    <!-- STEP 2: customer info -->
+    <div id="resStep2" class="step space-y-4">
+      <section class="soft-card p-5 space-y-4">
+        <h2 class="text-sm font-bold text-stone-600 flex items-center gap-1.5">
+          <i data-lucide="user-pen" class="w-4 h-4 text-pink-400"></i>
+          お客様情報をご入力ください
+        </h2>
+
+        <div>
+          <label class="text-[12px] font-semibold text-stone-500">お名前<span class="text-pink-400">必須</span></label>
+          <input id="inpName" type="text" placeholder="例）大阪 花子" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+        </div>
+
+        <div class="flex gap-3">
+          <div class="w-1/3">
+            <label class="text-[12px] font-semibold text-stone-500">年齢</label>
+            <input id="inpAge" type="number" min="0" max="120" placeholder="例）38" class="mt-1 w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm">
+          </div>
+          <div class="w-2/3">
+            <label class="text-[12px] font-semibold text-stone-500">電話番号<span class="text-pink-400">必須</span></label>
+            <input id="inpPhone" type="tel" placeholder="例）090-1234-5678" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[12px] font-semibold text-stone-500">メールアドレス<span class="text-pink-400">必須</span></label>
+          <input id="inpEmail" type="email" placeholder="例）hanako@example.com" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+        </div>
+
+        <div>
+          <label class="text-[12px] font-semibold text-stone-500">マツエクのご利用経験</label>
+          <div class="mt-1.5 flex gap-2">
+            <button type="button" class="matsu-btn toggle-chip flex-1 border border-stone-200 rounded-xl py-2.5 text-sm font-semibold text-stone-500" data-val="yes">利用したことがある</button>
+            <button type="button" class="matsu-btn toggle-chip flex-1 border border-stone-200 rounded-xl py-2.5 text-sm font-semibold text-stone-500" data-val="no">利用したことがない</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[12px] font-semibold text-stone-500">気になるテーマ（複数選択可）</label>
+          <div class="mt-1.5 flex flex-wrap gap-2" id="topicChips">
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="NISA">NISA</button>
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="iDeCo">iDeCo</button>
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="保険の見直し">保険の見直し</button>
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="家計管理">家計管理</button>
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="老後資金">老後資金</button>
+            <button type="button" class="topic-chip toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="その他">その他</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[12px] font-semibold text-stone-500">ご相談内容（自由記述）</label>
+          <textarea id="inpMemo" rows="3" placeholder="今、気になっていることを気軽にお書きください" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm resize-none"></textarea>
+        </div>
+      </section>
+
+      <div class="flex gap-3">
+        <button onclick="goStep(1)" class="w-1/3 bg-white border border-stone-200 text-stone-500 font-bold py-3.5 rounded-full">もどる</button>
+        <button onclick="tryGoStep3()" class="w-2/3 bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-full shadow-soft">つぎへ進む</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: confirm -->
+    <div id="resStep3" class="step space-y-4">
+      <section class="soft-card p-5">
+        <h2 class="text-sm font-bold text-stone-600 mb-3 flex items-center gap-1.5">
+          <i data-lucide="clipboard-check" class="w-4 h-4 text-pink-400"></i>
+          ご予約内容の確認
+        </h2>
+        <div id="confirmBox" class="space-y-2 text-sm"></div>
+      </section>
+
+      <section class="soft-card p-5 bg-cream-50">
+        <h3 class="text-[13px] font-bold text-stone-600 flex items-center gap-1.5 mb-2">
+          <i data-lucide="heart" class="w-3.5 h-3.5 text-pink-400"></i>
+          キャンセルについてのお願い
+        </h3>
+        <p class="text-[12px] text-stone-500 leading-relaxed">
+          席の準備をしてお待ちしておりますので、当日キャンセルの場合は誠に恐れ入りますが、相談料と同額をお支払いいただいております。日程の変更がある場合は、できるだけお早めにご連絡くださいね。
+        </p>
+        <label class="mt-3 flex items-start gap-2 text-[12px] text-stone-600">
+          <input type="checkbox" id="agreeCheck" class="mt-0.5 w-4 h-4 accent-pink-500">
+          上記のキャンセルポリシーに同意します
+        </label>
+      </section>
+
+      <div class="flex gap-3">
+        <button onclick="goStep(2)" class="w-1/3 bg-white border border-stone-200 text-stone-500 font-bold py-3.5 rounded-full">もどる</button>
+        <button id="submitBtn" onclick="submitReservation()" class="w-2/3 bg-mint-500 hover:bg-mint-600 text-white font-bold py-3.5 rounded-full shadow-soft flex items-center justify-center gap-1.5">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          予約を確定する
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ PAGE: ADMIN ============ -->
+  <main id="page-admin" class="page px-5 pt-5 space-y-5">
+    <section class="soft-card p-5">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-sm font-bold text-stone-600 flex items-center gap-1.5">
+          <i data-lucide="lock" class="w-4 h-4 text-stone-400"></i>
+          管理者モード（デモ）
+        </h2>
+        <button onclick="goToPage('home')" class="text-[11px] text-stone-400 underline">閉じる</button>
+      </div>
+      <p class="text-[11px] text-stone-400">※これはデモ用の管理画面です。実際の運用ではログイン認証が必要です。</p>
+    </section>
+
+    <!-- calendar -->
+    <section class="soft-card p-5">
+      <div class="flex items-center justify-between mb-3">
+        <button onclick="shiftAdminMonth(-1)" class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center"><i data-lucide="chevron-left" class="w-4 h-4 text-pink-500"></i></button>
+        <h3 id="adminMonthLabel" class="text-sm font-bold text-stone-600"></h3>
+        <button onclick="shiftAdminMonth(1)" class="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center"><i data-lucide="chevron-right" class="w-4 h-4 text-pink-500"></i></button>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-stone-400 mb-1">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div id="adminCalendar" class="grid grid-cols-7 gap-1"></div>
+      <div id="adminDayDetail" class="mt-3"></div>
+    </section>
+
+    <!-- reservation list -->
+    <section class="soft-card p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold text-stone-600 flex items-center gap-1.5">
+          <i data-lucide="users" class="w-4 h-4 text-mint-500"></i>
+          予約者名簿
+          <span id="resCount" class="text-[11px] bg-mint-100 text-mint-600 px-2 py-0.5 rounded-full"></span>
+        </h2>
+        <button onclick="clearAllReservations()" class="text-[11px] text-red-400 flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>全削除
+        </button>
+      </div>
+      <div id="adminList" class="space-y-3"></div>
+    </section>
+
+    <!-- Google連携設定 -->
+    <section class="soft-card p-5">
+      <h2 class="text-sm font-bold text-stone-600 mb-1 flex items-center gap-1.5">
+        <i data-lucide="mail-check" class="w-4 h-4 text-mint-500"></i>
+        メール通知・スプレッドシート連携
+      </h2>
+      <p class="text-[11px] text-stone-400 leading-relaxed mb-3">
+        現在このURLが全端末に組み込まれており、お客様がどのスマホ・PCから予約しても①お客様へ確認メール、②あなたへ通知メールが自動で届き、予約内容がGoogleスプレッドシートに記録されます（要インターネット接続）。Apps Scriptを再デプロイしてURLが変わった場合のみ、下に新しいURLを貼り直してください。設定方法は同じフォルダ内の「google-apps-script-setup.md」をご覧ください。
+      </p>
+      <label class="text-[12px] font-semibold text-stone-500">Apps Script ウェブアプリURL</label>
+      <input id="gasUrlInput" type="url" placeholder="https://script.google.com/macros/s/xxxxx/exec" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      <div class="flex gap-2 mt-2">
+        <button onclick="saveGasUrl()" class="flex-1 bg-mint-500 text-white text-sm font-bold py-2.5 rounded-full">保存する</button>
+        <button onclick="testGasUrl()" class="flex-1 bg-white border border-stone-200 text-stone-500 text-sm font-bold py-2.5 rounded-full">テスト送信</button>
+      </div>
+      <p id="gasStatus" class="text-[11px] mt-2 text-mint-600 min-h-[1em]"></p>
+    </section>
+  </main>
+
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="fixed bottom-0 left-0 right-0 z-40">
+  <div class="max-w-[480px] mx-auto">
+    <div class="mx-4 mb-4 bg-white rounded-3xl shadow-soft border border-pink-50 flex justify-around py-2">
+      <button onclick="goToPage('home')" class="tab-btn active-tab flex flex-col items-center gap-1 px-6 py-1.5 text-[11px] text-stone-400 font-semibold" data-tab="home">
+        <span class="tab-icon-wrap w-9 h-9 rounded-full flex items-center justify-center transition"><i data-lucide="house" class="w-5 h-5"></i></span>
+        ホーム
+      </button>
+      <button onclick="goToPage('reserve')" class="tab-btn flex flex-col items-center gap-1 px-6 py-1.5 text-[11px] text-stone-400 font-semibold" data-tab="reserve">
+        <span class="tab-icon-wrap w-9 h-9 rounded-full flex items-center justify-center transition"><i data-lucide="calendar-heart" class="w-5 h-5"></i></span>
+        予約
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ MODAL: success ============ -->
+<div id="successModal" class="modal-overlay" style="display:none;">
+  <div class="soft-card w-full max-w-sm p-6 text-center relative">
+    <div class="w-16 h-16 mx-auto rounded-full bg-mint-100 flex items-center justify-center mb-3">
+      <i data-lucide="party-popper" class="w-8 h-8 text-mint-500"></i>
+    </div>
+    <h3 class="text-lg font-bold text-stone-700" id="modalTitle">予約が確定しました！</h3>
+    <p class="text-sm text-stone-500 mt-2 leading-relaxed" id="modalDetail"></p>
+    <div class="mt-4 bg-cream-50 rounded-2xl p-3 text-left flex gap-2 items-start">
+      <i data-lucide="mail" class="w-4 h-4 text-pink-400 mt-0.5 flex-shrink-0"></i>
+      <p class="text-[11px] text-stone-500 leading-relaxed" id="reminderNote">
+        リマインドメールを送信しました（シミュレーション）。当日は少し早めにお越しくださいね。
+      </p>
+    </div>
+    <button onclick="closeModalToHome()" class="mt-5 w-full bg-pink-500 text-white font-bold py-3 rounded-full">
+      閉じる
+    </button>
+  </div>
+</div>
+
+<!-- ============ MODAL: 希望日の相談 ============ -->
+<div id="inquiryModal" class="modal-overlay" style="display:none;">
+  <div class="soft-card w-full max-w-sm p-6">
+    <div class="w-14 h-14 mx-auto rounded-full bg-mint-100 flex items-center justify-center mb-3">
+      <i data-lucide="calendar-search" class="w-7 h-7 text-mint-500"></i>
+    </div>
+    <h3 class="text-base font-bold text-stone-700 text-center">希望日を相談する</h3>
+    <p class="text-[11px] text-stone-500 text-center mt-1 mb-4 leading-relaxed">
+      表示中の日程にご都合が合わない場合、ご希望の日時を送っていただければ、丸岡が確認してご連絡いたします。
+    </p>
+    <div class="space-y-3 text-left">
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">お名前<span class="text-pink-400">必須</span></label>
+        <input id="inqName" type="text" placeholder="例）大阪 花子" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">ご希望の日時<span class="text-pink-400">必須</span></label>
+        <input id="inqDesired" type="text" placeholder="例）9月の平日夕方など" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">電話番号</label>
+        <input id="inqPhone" type="tel" placeholder="例）090-1234-5678" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">メールアドレス</label>
+        <input id="inqEmail" type="email" placeholder="例）hanako@example.com" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <p class="text-[11px] text-stone-400">※電話番号・メールアドレスはどちらか一方でも大丈夫です</p>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">ひとこと（任意）</label>
+        <textarea id="inqMemo" rows="2" placeholder="ご事情など、あれば教えてください" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm resize-none"></textarea>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeInquiryModal()" class="w-1/3 bg-white border border-stone-200 text-stone-500 font-bold py-3 rounded-full">キャンセル</button>
+      <button id="inquirySubmitBtn" onclick="submitInquiry()" class="w-2/3 bg-mint-500 hover:bg-mint-600 text-white font-bold py-3 rounded-full shadow-soft">この内容で相談する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: admin login ============ -->
+<div id="adminLoginModal" class="modal-overlay" style="display:none;">
+  <div class="soft-card w-full max-w-sm p-6 text-center">
+    <div class="w-14 h-14 mx-auto rounded-full bg-stone-100 flex items-center justify-center mb-3">
+      <i data-lucide="key-round" class="w-6 h-6 text-stone-400"></i>
+    </div>
+    <h3 class="text-base font-bold text-stone-700">管理者モード（デモ）</h3>
+    <p class="text-[11px] text-stone-400 mt-1 mb-3">デモ用パスワード： 0000</p>
+    <input id="adminPassInput" type="password" placeholder="パスワードを入力" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm text-center tracking-widest">
+    <p id="adminPassError" class="text-[11px] text-red-400 mt-1.5 h-4"></p>
+    <div class="flex gap-3 mt-2">
+      <button onclick="closeAdminLoginModal()" class="w-1/2 bg-white border border-stone-200 text-stone-500 font-bold py-3 rounded-full">キャンセル</button>
+      <button onclick="checkAdminPass()" class="w-1/2 bg-stone-600 text-white font-bold py-3 rounded-full">開く</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================================================
+   おかねの保健室 - 予約アプリ
+   全データは localStorage 内に保存されます（オフライン動作）
+======================================================== */
+
+const STORAGE_KEY = 'okaneHokenshitsuReservations';
+const GAS_URL_KEY = 'okaneHokenshitsuGasUrl';
+// 全端末で共通して使う連携先。管理者画面で別のURLを保存した場合はそちらが優先されます。
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwe3rRX1n7Cxe_PN-wovYisUfqrLEI7Oskx5jozCT8Az3OPzFtL-nehJo783oxf4sMj/exec';
+const TIME_SLOTS = ['11:00〜12:00','12:00〜13:00','13:00〜14:00','14:00〜15:00','15:00〜16:00'];
+const MAX_DATE_OPTIONS = 12; // 予約フォームの日付選択に表示する件数（増減はここを変えるだけ）
+
+let selectedDate = null;   // {iso, label}
+let selectedSlot = null;
+let selectedMatsu = null;  // 'yes' | 'no'
+let selectedTopics = [];
+let adminMonthCursor = new Date();
+let remoteBookedSlots = null; // Set('iso|slot') サーバー側の最新の空き状況（取得できなければ null）
+let remoteClosedDates = null; // Set('YYYY-MM-DD') 臨時休室にする日（取得できなければ null）
+let remoteExtraDates = null;  // Set('YYYY-MM-DD') 臨時で追加された開室日（取得できなければ null）
+
+/* ---------------- storage helpers ---------------- */
+function loadReservations() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveReservations(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+/* ---------------- navigation ---------------- */
+function goToPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+  const tabBtn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
+  if (tabBtn) tabBtn.classList.add('active-tab');
+
+  if (name === 'reserve') { resetReservationForm(); }
+  if (name === 'admin') { renderAdmin(); }
+  window.scrollTo({top:0, behavior:'smooth'});
+  lucide.createIcons();
+}
+
+/* ---------------- date generation ---------------- */
+const WEEKDAY_LABELS = ['日','月','火','水','木','金','土'];
+
+// 日付の「見た目の暦日」とISO文字列がずれないよう、UTC変換を経由せずローカルの年月日から直接組み立てる
+function isoOf(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isoToDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return null;
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+}
+
+function getNthTuesdaysOfMonth(year, month) {
+  const tues = [];
+  const d = new Date(year, month, 1);
+  while (d.getMonth() === month) {
+    if (d.getDay() === 2) tues.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return [tues[0], tues[2]].filter(Boolean);
+}
+
+/**
+ * 通常の「第1・第3火曜日」に、臨時開室日を追加し、休室日を除外した
+ * 予約可能な日付の一覧を返す（直近 MAX_DATE_OPTIONS 件）。
+ * 臨時開室日・休室日はGoogleスプレッドシートで管理者が自由に編集できる。
+ */
+function generateAvailableDates() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const results = [];
+  // MAX_DATE_OPTIONS件分は確実に集まるよう、余裕を持って先の月まで調べる（1ヶ月あたり最大2件のため）
+  const monthsAhead = Math.ceil(MAX_DATE_OPTIONS / 2) + 2;
+  for (let i = 0; i < monthsAhead; i++) {
+    const base = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    const tues = getNthTuesdaysOfMonth(base.getFullYear(), base.getMonth());
+    tues.forEach(t => { if (t >= today) results.push(t); });
+  }
+
+  const closed = remoteClosedDates || new Set();
+  let dateObjs = results.filter(d => !closed.has(isoOf(d)));
+
+  if (remoteExtraDates) {
+    remoteExtraDates.forEach(iso => {
+      if (closed.has(iso) || dateObjs.some(d => isoOf(d) === iso)) return;
+      const extra = isoToDate(iso);
+      if (extra && extra >= today) dateObjs.push(extra);
+    });
+  }
+
+  dateObjs.sort((a, b) => a - b);
+
+  return dateObjs.slice(0, MAX_DATE_OPTIONS).map(d => ({
+    iso: isoOf(d),
+    label: `${d.getMonth() + 1}/${d.getDate()}（${WEEKDAY_LABELS[d.getDay()]}）`
+  }));
+}
+
+/* ---------------- STEP 1 render ---------------- */
+function renderDateList() {
+  const dates = generateAvailableDates();
+  const wrap = document.getElementById('dateList');
+  wrap.innerHTML = '';
+  dates.forEach(d => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'date-card border-2 border-stone-100 rounded-2xl py-3 text-center transition';
+    btn.innerHTML = `<p class="text-sm font-bold text-stone-700">${d.label}</p><p class="text-[10px] text-stone-400">11:00-16:00</p>`;
+    btn.onclick = () => selectDate(d, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectDate(d, btnEl) {
+  selectedDate = d;
+  selectedSlot = null;
+  document.querySelectorAll('.date-card').forEach(el => el.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  renderSlotList();
+  updateStep1Button();
+}
+
+function renderSlotList() {
+  const wrap = document.getElementById('slotList');
+  const hint = document.getElementById('slotHint');
+  wrap.innerHTML = '';
+  if (!selectedDate) { hint.style.display = 'block'; return; }
+  hint.style.display = 'none';
+
+  const reservations = loadReservations();
+  TIME_SLOTS.forEach(slot => {
+    const taken = reservations.some(r => r.dateIso === selectedDate.iso && r.slot === slot)
+      || (remoteBookedSlots && remoteBookedSlots.has(selectedDate.iso + '|' + slot));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'slot-btn flex items-center justify-between border-2 border-stone-100 rounded-xl px-4 py-3 text-sm font-semibold text-stone-600' + (taken ? ' taken' : '');
+    btn.innerHTML = `<span>${slot}</span><span class="text-[11px]">${taken ? '予約済み' : '空きあり'}</span>`;
+    if (!taken) {
+      btn.onclick = () => {
+        selectedSlot = slot;
+        document.querySelectorAll('.slot-btn').forEach(el => el.classList.remove('selected'));
+        btn.classList.add('selected');
+        updateStep1Button();
+      };
+    } else {
+      btn.disabled = true;
+    }
+    wrap.appendChild(btn);
+  });
+}
+
+function updateStep1Button() {
+  const btn = document.getElementById('toStep2Btn');
+  if (selectedDate && selectedSlot) {
+    btn.disabled = false;
+    btn.className = 'w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-full shadow-soft transition active:scale-95';
+  } else {
+    btn.disabled = true;
+    btn.className = 'w-full bg-stone-200 text-stone-400 font-bold py-3.5 rounded-full transition';
+  }
+}
+
+/* ---------------- STEP navigation ---------------- */
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('resStep' + n).classList.add('active');
+
+  [1,2,3].forEach(i => {
+    const circle = document.querySelector(`#stepIndicator${i} .step-circle`);
+    const label = document.querySelector(`#stepIndicator${i} span`);
+    if (i <= n) {
+      circle.className = 'step-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-pink-500 text-white';
+      label.className = 'text-[10px] text-stone-600 font-semibold';
+    } else {
+      circle.className = 'step-circle w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-stone-200 text-stone-400';
+      label.className = 'text-[10px] text-stone-400';
+    }
+  });
+  if (n === 3) renderConfirm();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function tryGoStep3() {
+  const name = document.getElementById('inpName').value.trim();
+  const phone = document.getElementById('inpPhone').value.trim();
+  const email = document.getElementById('inpEmail').value.trim();
+  if (!name || !phone || !email) {
+    alert('お名前・電話番号・メールアドレスは必須項目です。');
+    return;
+  }
+  goStep(3);
+}
+
+/* ---------------- toggles (matsu / topics) ---------------- */
+document.addEventListener('click', (e) => {
+  const matsuBtn = e.target.closest('.matsu-btn');
+  if (matsuBtn) {
+    selectedMatsu = matsuBtn.dataset.val;
+    document.querySelectorAll('.matsu-btn').forEach(b => b.classList.remove('selected'));
+    matsuBtn.classList.add('selected');
+  }
+  const topicBtn = e.target.closest('.topic-chip');
+  if (topicBtn) {
+    const val = topicBtn.dataset.val;
+    if (selectedTopics.includes(val)) {
+      selectedTopics = selectedTopics.filter(t => t !== val);
+      topicBtn.classList.remove('selected');
+    } else {
+      selectedTopics.push(val);
+      topicBtn.classList.add('selected');
+    }
+  }
+});
+
+/* ---------------- STEP 3 confirm ---------------- */
+function renderConfirm() {
+  const name = document.getElementById('inpName').value.trim();
+  const age = document.getElementById('inpAge').value.trim();
+  const phone = document.getElementById('inpPhone').value.trim();
+  const email = document.getElementById('inpEmail').value.trim();
+  const memo = document.getElementById('inpMemo').value.trim();
+
+  const rows = [
+    ['日時', `${selectedDate.label} ${selectedSlot}`],
+    ['お名前', name],
+    ['年齢', age ? age + '歳' : '未入力'],
+    ['電話番号', phone],
+    ['メール', email],
+    ['マツエク経験', selectedMatsu === 'yes' ? 'あり（1,500円）' : selectedMatsu === 'no' ? 'なし（2,000円）' : '未回答（2,000円）'],
+    ['気になるテーマ', selectedTopics.length ? selectedTopics.join('、') : 'なし'],
+    ['ご相談内容', memo || '未記入'],
+  ];
+
+  document.getElementById('confirmBox').innerHTML = rows.map(([k,v]) => `
+    <div class="flex justify-between gap-3 border-b border-stone-50 pb-2">
+      <span class="text-stone-400 text-[12px] w-24 flex-shrink-0">${k}</span>
+      <span class="text-stone-700 text-[13px] font-semibold text-right">${escapeHtml(v)}</span>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------------- submit ---------------- */
+async function submitReservation() {
+  if (!document.getElementById('agreeCheck').checked) {
+    alert('キャンセルポリシーへの同意をお願いいたします。');
+    return;
+  }
+  const name = document.getElementById('inpName').value.trim();
+  const age = document.getElementById('inpAge').value.trim();
+  const phone = document.getElementById('inpPhone').value.trim();
+  const email = document.getElementById('inpEmail').value.trim();
+  const memo = document.getElementById('inpMemo').value.trim();
+  const price = selectedMatsu === 'yes' ? 1500 : 2000;
+
+  const reservation = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+    dateIso: selectedDate.iso,
+    dateLabel: selectedDate.label,
+    slot: selectedSlot,
+    name, age, phone, email,
+    matsueku: selectedMatsu || 'no',
+    topics: [...selectedTopics],
+    memo,
+    price,
+    createdAt: new Date().toISOString()
+  };
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '送信しています…';
+
+  const outcome = await sendToGoogleSheet(reservation);
+
+  if (outcome === 'conflict') {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> 予約を確定する';
+    lucide.createIcons();
+    alert('申し訳ございません、ちょうどこの時間帯のご予約が埋まってしまいました。お手数ですが、別の日時をお選びください。');
+    goStep(1);
+    await refreshRemoteAvailability();
+    renderSlotList();
+    return;
+  }
+
+  const list = loadReservations();
+  list.push(reservation);
+  saveReservations(list);
+
+  document.getElementById('modalTitle').textContent = '予約が確定しました！';
+  document.getElementById('modalDetail').textContent =
+    `${selectedDate.label} ${selectedSlot} にてお待ちしております。`;
+  document.getElementById('reminderNote').textContent = outcome === 'ok'
+    ? 'ご入力いただいたメールアドレスに確認メールをお送りしました。当日は少し早めにお越しくださいね。'
+    : 'リマインドメールを送信しました（シミュレーション）。当日は少し早めにお越しくださいね。';
+  document.getElementById('successModal').style.display = 'flex';
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> 予約を確定する';
+  lucide.createIcons();
+}
+
+/* ---------------- Google Apps Script 連携（メール送信・スプレッドシート記録） ---------------- */
+function loadGasUrl() {
+  const saved = localStorage.getItem(GAS_URL_KEY);
+  // 一度も保存操作をしていない端末は、組み込みの既定URLを使う。
+  // 管理者が意図的に空にして保存した場合だけ「連携なし」として扱う。
+  if (saved === null) return DEFAULT_GAS_URL;
+  return saved.trim();
+}
+
+let lastGasErrorMessage = ''; // サーバー側でエラーが起きたとき、その内容をここに残す（管理者のテスト送信で表示するため）
+
+/**
+ * 予約データをサーバーへ送信する。
+ * 戻り値: 'ok'（成功） / 'conflict'（その日時は既に埋まっていた）
+ *        / 'error'（サーバー側でエラーが起きた。lastGasErrorMessage に詳細あり） / 'offline'（通信できなかった）
+ */
+async function sendToGoogleSheet(reservation) {
+  const url = loadGasUrl();
+  if (!url) return 'offline';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(reservation)
+    });
+    const json = await res.json();
+    if (json.result === 'error') {
+      lastGasErrorMessage = json.message || '(詳細不明のエラー)';
+      console.error('GAS error:', lastGasErrorMessage);
+      return 'error';
+    }
+    return json.result === 'conflict' ? 'conflict' : 'ok';
+  } catch (err) {
+    /* 通信できない場合は静かに諦める（予約自体はlocalStorageに保存済み） */
+    return 'offline';
+  }
+}
+
+function saveGasUrl() {
+  const val = document.getElementById('gasUrlInput').value.trim();
+  localStorage.setItem(GAS_URL_KEY, val);
+  const status = document.getElementById('gasStatus');
+  status.textContent = val
+    ? '保存しました。次のご予約からメール送信・スプレッドシート連携が有効になります。'
+    : '連携URLを空にしました（メール送信は行われません）。';
+}
+
+async function testGasUrl() {
+  const url = loadGasUrl();
+  const status = document.getElementById('gasStatus');
+  if (!url) {
+    status.textContent = '先にURLを保存してください。';
+    return;
+  }
+  status.textContent = '送信しています…';
+  // テストのたびに日付をランダムにして、二重予約防止の「conflict」判定と衝突しないようにする
+  const randomIso = new Date(2000, 0, 1 + Math.floor(Math.random() * 300)).toISOString().slice(0,10);
+  const outcome = await sendToGoogleSheet({
+    id: 'test-' + Date.now(),
+    dateIso: randomIso,
+    dateLabel: 'テスト送信',
+    slot: '11:00〜12:00',
+    name: 'テスト太郎',
+    age: '30',
+    phone: '090-0000-0000',
+    email: 'kananaka79@gmail.com',
+    matsueku: 'no',
+    topics: ['テスト'],
+    memo: 'これは連携テストです。',
+    price: 2000,
+    createdAt: new Date().toISOString()
+  });
+  if (outcome === 'ok') {
+    status.textContent = 'テストデータを送信しました。スプレッドシートとメールをご確認ください。';
+  } else if (outcome === 'conflict') {
+    status.textContent = 'たまたま同じ日時のテストデータが既にありました。もう一度押してみてください。';
+  } else if (outcome === 'error') {
+    status.innerHTML = '<span class="text-red-500 font-bold">サーバー側でエラーが発生しました：</span><br><span class="text-red-500 break-all">' + escapeHtml(lastGasErrorMessage) + '</span>';
+  } else {
+    status.textContent = '送信できませんでした。通信環境かURLの設定をご確認ください。';
+  }
+}
+
+function closeModalToHome() {
+  document.getElementById('successModal').style.display = 'none';
+  goToPage('home');
+}
+
+/* ---------------- 希望日の相談（表示中の日程に希望がない場合） ---------------- */
+function openInquiryModal() {
+  ['inqName','inqDesired','inqPhone','inqEmail','inqMemo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inquiryModal').style.display = 'flex';
+}
+
+function closeInquiryModal() {
+  document.getElementById('inquiryModal').style.display = 'none';
+}
+
+async function submitInquiry() {
+  const name = document.getElementById('inqName').value.trim();
+  const desired = document.getElementById('inqDesired').value.trim();
+  const phone = document.getElementById('inqPhone').value.trim();
+  const email = document.getElementById('inqEmail').value.trim();
+  const memo = document.getElementById('inqMemo').value.trim();
+
+  if (!name || !desired || (!phone && !email)) {
+    alert('お名前・ご希望の日時・連絡先（電話番号かメールアドレスのどちらか）をご入力ください。');
+    return;
+  }
+
+  const btn = document.getElementById('inquirySubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信しています…';
+
+  const outcome = await sendToGoogleSheet({
+    type: 'inquiry',
+    name, phone, email, desired, memo,
+    createdAt: new Date().toISOString()
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'この内容で相談する';
+
+  if (outcome === 'offline') {
+    alert('送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。');
+    return;
+  }
+  if (outcome === 'error') {
+    alert('送信中にエラーが発生しました。お手数ですが、下の内容をそのまま担当者にお伝えください。\n\n' + lastGasErrorMessage);
+    return;
+  }
+
+  closeInquiryModal();
+  document.getElementById('modalTitle').textContent = 'ご相談を受け付けました！';
+  document.getElementById('modalDetail').textContent =
+    'ご希望の日程を確認のうえ、丸岡より改めてご連絡いたします。少々お待ちくださいね。';
+  document.getElementById('reminderNote').textContent = email
+    ? 'ご入力いただいたメールアドレスに受付メールをお送りしました。'
+    : 'お電話にてご連絡させていただきます。';
+  document.getElementById('successModal').style.display = 'flex';
+  lucide.createIcons();
+}
+
+async function resetReservationForm() {
+  selectedDate = null;
+  selectedSlot = null;
+  selectedMatsu = null;
+  selectedTopics = [];
+  ['inpName','inpAge','inpPhone','inpEmail','inpMemo'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('agreeCheck').checked = false;
+  document.querySelectorAll('.matsu-btn, .topic-chip').forEach(b => b.classList.remove('selected'));
+  goStep(1);
+  renderDateList();
+  renderSlotList();
+  updateStep1Button();
+
+  const statusEl = document.getElementById('availabilityStatus');
+  statusEl.textContent = '最新の空き状況を確認しています…';
+  statusEl.classList.remove('hidden');
+  await refreshRemoteAvailability();
+  statusEl.classList.add('hidden');
+  renderDateList();
+  renderSlotList();
+}
+
+/**
+ * サーバー（Googleスプレッドシート）から、今埋まっている日時・休室日・臨時開室日を取得する。
+ * オフライン等で取得できない場合は、通常ルール＋ローカルの空き状況チェックのみで続行する。
+ */
+async function refreshRemoteAvailability() {
+  const url = loadGasUrl();
+  if (!url) { remoteBookedSlots = null; remoteClosedDates = null; remoteExtraDates = null; return; }
+  try {
+    const sep = url.includes('?') ? '&' : '?';
+    const res = await fetch(url + sep + 'action=slots');
+    const data = await res.json();
+    remoteBookedSlots = new Set((data.bookedSlots || []).map(r => r.dateIso + '|' + r.slot));
+    remoteClosedDates = new Set(data.closedDates || []);
+    remoteExtraDates = new Set(data.extraDates || []);
+  } catch (err) {
+    // 通信できない場合は静かに諦め、通常ルール＋ローカルの空き状況チェックのみで続行する
+  }
+}
+
+/* ================= ADMIN ================= */
+const ADMIN_PASSWORD = '0000';
+
+document.getElementById('secretBtn').addEventListener('click', () => {
+  document.getElementById('adminPassInput').value = '';
+  document.getElementById('adminPassError').textContent = '';
+  document.getElementById('adminLoginModal').style.display = 'flex';
+});
+
+function closeAdminLoginModal() {
+  document.getElementById('adminLoginModal').style.display = 'none';
+}
+
+function checkAdminPass() {
+  const val = document.getElementById('adminPassInput').value;
+  if (val === ADMIN_PASSWORD) {
+    closeAdminLoginModal();
+    goToPage('admin');
+  } else {
+    document.getElementById('adminPassError').textContent = 'パスワードが違います';
+  }
+}
+
+function renderAdmin() {
+  renderAdminCalendar();
+  renderAdminList();
+  document.getElementById('gasUrlInput').value = loadGasUrl();
+  document.getElementById('gasStatus').textContent = '';
+}
+
+function renderAdminList() {
+  const list = loadReservations().sort((a,b) => (a.dateIso+a.slot).localeCompare(b.dateIso+b.slot));
+  const wrap = document.getElementById('adminList');
+  document.getElementById('resCount').textContent = list.length + '件';
+
+  if (list.length === 0) {
+    wrap.innerHTML = `<p class="text-center text-[12px] text-stone-400 py-6">まだ予約はありません</p>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(r => `
+    <div class="border border-stone-100 rounded-2xl p-3.5">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="text-sm font-bold text-stone-700">${escapeHtml(r.name)} <span class="text-[11px] font-normal text-stone-400">${r.age ? r.age+'歳' : ''}</span></p>
+          <p class="text-[11px] text-pink-500 font-semibold mt-0.5">${r.dateLabel} ${r.slot}</p>
+        </div>
+        <button onclick="deleteReservation('${r.id}')" class="text-stone-300 hover:text-red-400">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-stone-500">
+        <span>📞 ${escapeHtml(r.phone)}</span>
+        <span>✉️ ${escapeHtml(r.email)}</span>
+        <span>マツエク：${r.matsueku === 'yes' ? 'あり' : 'なし'}</span>
+        <span>料金：${r.price}円</span>
+      </div>
+      ${r.topics && r.topics.length ? `<p class="mt-1.5 text-[11px] text-mint-600">${r.topics.map(t=>'#'+t).join(' ')}</p>` : ''}
+      ${r.memo ? `<p class="mt-1.5 text-[11px] text-stone-500 bg-cream-50 rounded-lg p-2">${escapeHtml(r.memo)}</p>` : ''}
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function deleteReservation(id) {
+  if (!confirm('この予約を削除しますか？')) return;
+  const list = loadReservations().filter(r => r.id !== id);
+  saveReservations(list);
+  renderAdmin();
+}
+
+function clearAllReservations() {
+  if (!confirm('すべての予約データを削除します。よろしいですか？')) return;
+  saveReservations([]);
+  renderAdmin();
+}
+
+function shiftAdminMonth(delta) {
+  adminMonthCursor.setMonth(adminMonthCursor.getMonth() + delta);
+  renderAdminCalendar();
+}
+
+function renderAdminCalendar() {
+  const y = adminMonthCursor.getFullYear();
+  const m = adminMonthCursor.getMonth();
+  document.getElementById('adminMonthLabel').textContent = `${y}年${m+1}月`;
+
+  const reservations = loadReservations();
+  const resByDay = {};
+  reservations.forEach(r => {
+    if (r.dateIso.slice(0,7) === `${y}-${String(m+1).padStart(2,'0')}`) {
+      const day = parseInt(r.dateIso.slice(8,10));
+      resByDay[day] = (resByDay[day] || 0) + 1;
+    }
+  });
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const grid = document.getElementById('adminCalendar');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < firstDay; i++) {
+    grid.appendChild(document.createElement('div'));
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const cell = document.createElement('button');
+    const hasRes = !!resByDay[day];
+    cell.type = 'button';
+    cell.className = `relative h-10 rounded-xl text-[12px] flex flex-col items-center justify-center ${hasRes ? 'bg-pink-50 text-pink-600 font-bold' : 'text-stone-500'}`;
+    cell.innerHTML = `${day}${hasRes ? `<span class="w-1.5 h-1.5 rounded-full bg-pink-400 mt-0.5"></span>` : ''}`;
+    if (hasRes) {
+      cell.onclick = () => showAdminDayDetail(y, m, day);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function showAdminDayDetail(y, m, day) {
+  const iso = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const list = loadReservations().filter(r => r.dateIso === iso);
+  const wrap = document.getElementById('adminDayDetail');
+  if (!list.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div class="bg-mint-50 rounded-xl p-3 space-y-1">
+      <p class="text-[11px] font-bold text-mint-700 mb-1">${m+1}/${day} の予約</p>
+      ${list.map(r => `<p class="text-[11px] text-stone-600">${r.slot} — ${escapeHtml(r.name)}様</p>`).join('')}
+    </div>
+  `;
+}
+
+/* ---------------- init ---------------- */
+window.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  renderDateList();
+  renderSlotList();
+  updateStep1Button();
+});
+</script>
+</body>
+</html>
