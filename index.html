@@ -65,6 +65,7 @@
   .modal-overlay { position: fixed; inset: 0; background: rgba(60,40,45,0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
 
   .toggle-chip.selected { background: #4ab381; color: #fff; border-color: #4ab381; }
+  .style-btn.selected span { color: #fff !important; }
 
   input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 3px rgba(249,109,142,0.25); }
 
@@ -83,7 +84,7 @@
       </div>
       <div class="leading-tight">
         <p class="text-[15px] font-bold text-stone-700">おかねの保健室</p>
-        <p class="text-[10px] text-stone-400">売らない・教える、お金の相談室</p>
+        <p class="text-[10px] text-stone-400">押し売りしない・教える、お金の相談室</p>
       </div>
     </div>
     <button id="secretBtn" class="admin-secret w-7 h-7 flex items-center justify-center text-stone-300" aria-label="admin">
@@ -109,7 +110,7 @@
           そのお悩み、ここで大丈夫。<br>
           元教員のFPが、"わかるまで"寄り添います。
         </p>
-        <button onclick="goToPage('reserve')" class="mt-5 w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-full shadow-soft transition active:scale-95">
+        <button onclick="goToPage('menu')" class="mt-5 w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3.5 rounded-full shadow-soft transition active:scale-95">
           かんたん予約をする
         </button>
       </div>
@@ -147,15 +148,15 @@
         <i data-lucide="shield-check" class="w-4 h-4 text-mint-500"></i>
         おかねの保健室のお約束
       </h2>
-      <p class="text-lg font-bold text-mint-600 mt-1 mb-3">売らない。教えるだけ。</p>
+      <p class="text-lg font-bold text-mint-600 mt-1 mb-3">押し売りしない。わかるまで教える。</p>
       <div class="grid grid-cols-3 gap-2 text-center">
         <div class="bg-white rounded-2xl p-3 shadow-sm">
           <i data-lucide="ban" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
-          <p class="text-[11px] text-stone-500 leading-tight">商品の<br>販売なし</p>
+          <p class="text-[11px] text-stone-500 leading-tight">押し売り<br>なし</p>
         </div>
         <div class="bg-white rounded-2xl p-3 shadow-sm">
-          <i data-lucide="megaphone-off" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
-          <p class="text-[11px] text-stone-500 leading-tight">しつこい<br>勧誘なし</p>
+          <i data-lucide="message-circle-heart" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
+          <p class="text-[11px] text-stone-500 leading-tight">大事なことは<br>先にお伝え</p>
         </div>
         <div class="bg-white rounded-2xl p-3 shadow-sm">
           <i data-lucide="graduation-cap" class="w-5 h-5 mx-auto text-mint-500 mb-1"></i>
@@ -163,7 +164,7 @@
         </div>
       </div>
       <p class="text-[12px] text-stone-500 mt-3 leading-relaxed">
-        特定の金融機関に属さない独立系FPだから、特定の商品をおすすめすることはありません。学校の先生のように、あなたの疑問を「わかった！」に変えることだけを大切にしています。
+        特定の金融機関に属さない独立系FPとして、「あなたに合うかどうか」をいちばんに考えます。提携先をご紹介する場合は、紹介によって報酬を受け取ることがあるかどうかも含めて、事前にきちんとお伝えします。学校の先生のように、あなたの疑問を「わかった！」に変えることを大切にしています。
       </p>
     </section>
 
@@ -238,7 +239,7 @@
     </button>
 
     <p class="text-center text-[11px] text-stone-400 pb-2">
-      ※特定の金融商品のご案内・販売、将来の利益を保証するご案内は一切行っておりません。
+      ※将来の利益を保証するようなご案内や、無理な勧誘はいたしません。
     </p>
   </main>
 
@@ -389,6 +390,146 @@
     </div>
   </main>
 
+  <!-- ============ PAGE: MENU（相談メニューをえらぶ） ============ -->
+  <main id="page-menu" class="page px-5 pt-5 space-y-5">
+    <section class="text-center">
+      <h1 class="text-base font-bold text-stone-700">ご相談のしかたを えらんでください</h1>
+      <p class="text-[12px] text-stone-500 mt-1">どちらも、はじめての方で大丈夫です</p>
+    </section>
+
+    <button type="button" onclick="goToPage('reserve')" class="soft-card w-full p-5 text-left flex gap-4 items-start active:scale-[0.98] transition">
+      <div class="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="school" class="w-6 h-6 text-pink-500"></i>
+      </div>
+      <div class="flex-1">
+        <p class="text-[15px] font-bold text-stone-700">リアル保健室</p>
+        <p class="text-[12px] text-stone-500 mt-0.5 leading-relaxed">茨木市の商店街で、気軽にお話しできる開室日です</p>
+        <div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+          <span class="bg-pink-50 text-pink-600 rounded-full px-2 py-0.5">第1・第3火曜 11〜16時</span>
+          <span class="bg-pink-50 text-pink-600 rounded-full px-2 py-0.5">60分 2,000円</span>
+        </div>
+      </div>
+      <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300 mt-3"></i>
+    </button>
+
+    <button type="button" onclick="goToPage('consult')" class="soft-card w-full p-5 text-left flex gap-4 items-start active:scale-[0.98] transition">
+      <div class="w-12 h-12 rounded-2xl bg-mint-50 flex items-center justify-center flex-shrink-0">
+        <i data-lucide="messages-square" class="w-6 h-6 text-mint-500"></i>
+      </div>
+      <div class="flex-1">
+        <p class="text-[15px] font-bold text-stone-700">個別相談</p>
+        <p class="text-[12px] text-stone-500 mt-0.5 leading-relaxed">ご都合のよい日時で、じっくりお話を聞きます。オンラインもOKです</p>
+        <div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+          <span class="bg-mint-50 text-mint-500 rounded-full px-2 py-0.5">日時はご希望に合わせます</span>
+          <span class="bg-mint-50 text-mint-500 rounded-full px-2 py-0.5">初回90分 5,000円</span>
+        </div>
+      </div>
+      <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300 mt-3"></i>
+    </button>
+
+    <p class="text-center text-[11px] text-stone-400 leading-relaxed">
+      迷ったら「個別相談」がおすすめです。<br>ご都合に合わせて日時を決められます。
+    </p>
+  </main>
+
+  <!-- ============ PAGE: CONSULT（個別相談のリクエスト） ============ -->
+  <main id="page-consult" class="page px-5 pt-5 space-y-5">
+    <section class="soft-card p-5 space-y-3">
+      <h2 class="text-sm font-bold text-stone-600 flex items-center gap-1.5">
+        <i data-lucide="messages-square" class="w-4 h-4 text-mint-500"></i>
+        個別相談のご予約
+      </h2>
+      <p class="text-[12px] text-stone-500 leading-relaxed">
+        ご希望の日時を3つまで送ってください。丸岡が確認して、日時を確定するご連絡をいたします。
+      </p>
+      <div class="bg-cream-50 rounded-2xl p-3 text-[12px] text-stone-600 space-y-1">
+        <div class="flex justify-between"><span>初回（90分）</span><span class="font-bold">5,000円</span></div>
+        <div class="flex justify-between"><span>2回目以降</span><span class="font-bold">10,000円</span></div>
+      </div>
+      <div class="bg-pink-50 rounded-2xl p-3 text-[12px] text-pink-600 leading-relaxed">
+        🎁 LINE登録から10日以内のご予約は、初回 <b>3,000円</b> です
+      </div>
+    </section>
+
+    <section class="soft-card p-5">
+      <h2 class="text-sm font-bold text-stone-600 mb-3">① ご相談の形をえらぶ</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" class="style-btn toggle-chip border border-stone-200 rounded-xl p-3 text-left" data-val="online">
+          <span class="block text-sm font-bold">💻 オンライン</span>
+          <span class="block text-[11px] text-stone-400 mt-0.5">曜日・時間はご相談ください</span>
+        </button>
+        <button type="button" class="style-btn toggle-chip border border-stone-200 rounded-xl p-3 text-left" data-val="face">
+          <span class="block text-sm font-bold">🏫 対面</span>
+          <span class="block text-[11px] text-stone-400 mt-0.5">平日10〜16時（土日祝はご相談）</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="soft-card p-5 space-y-3">
+      <h2 class="text-sm font-bold text-stone-600">② ご希望の日時（3つまで）</h2>
+      <div id="wishList" class="space-y-3"></div>
+      <p id="wishHint" class="text-[11px] text-stone-400 leading-relaxed">第1希望だけでも大丈夫です。</p>
+    </section>
+
+    <section class="soft-card p-5 space-y-4">
+      <h2 class="text-sm font-bold text-stone-600">③ お客様情報</h2>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">お名前<span class="text-pink-400">必須</span></label>
+        <input id="conName" type="text" placeholder="例）大阪 花子" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">メールアドレス</label>
+        <input id="conEmail" type="email" placeholder="例）hanako@example.com" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">電話番号</label>
+        <input id="conPhone" type="tel" placeholder="例）090-1234-5678" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm">
+      </div>
+      <p class="text-[11px] text-stone-400 -mt-2">※メールアドレス・電話番号は、どちらか一方でも大丈夫です</p>
+
+      <label class="flex items-start gap-2 bg-pink-50 rounded-xl p-3 text-[12px] text-stone-600">
+        <input type="checkbox" id="conLineGift" class="mt-0.5 w-4 h-4 accent-pink-500">
+        LINE登録から10日以内です（初回 3,000円の特典を使う）
+      </label>
+
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">気になるテーマ（複数選択可）</label>
+        <div class="mt-1.5 flex flex-wrap gap-2">
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="NISA・iDeCo">NISA・iDeCo</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="預金の置き場所">預金の置き場所</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="退職金・相続">退職金・相続</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="教育費">教育費</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="保険の見直し">保険の見直し</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="老後資金">老後資金</button>
+          <button type="button" class="con-topic toggle-chip border border-stone-200 rounded-full px-3 py-1.5 text-[12px] font-semibold text-stone-500" data-val="その他">その他</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-[12px] font-semibold text-stone-500">ご相談内容（任意）</label>
+        <textarea id="conMemo" rows="3" placeholder="今、気になっていることを気軽にお書きください" class="mt-1 w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm resize-none"></textarea>
+      </div>
+    </section>
+
+    <section class="soft-card p-5 bg-cream-50 space-y-2">
+      <p class="text-[12px] text-stone-500 leading-relaxed">
+        ご相談の内容によっては、提携している専門家や金融機関をご紹介することがあります。その場合は、紹介先や、丸岡が紹介によって報酬を受け取ることがあるかどうかも含めて、事前にきちんとご説明します。お断りいただいても大丈夫です。
+      </p>
+      <p class="text-[12px] text-stone-500 leading-relaxed">
+        日時の確定後、当日キャンセルの場合は、相談料と同額をお支払いいただいております。変更はできるだけお早めにご連絡くださいね。
+      </p>
+      <label class="flex items-start gap-2 text-[12px] text-stone-600 pt-1">
+        <input type="checkbox" id="conAgree" class="mt-0.5 w-4 h-4 accent-pink-500">
+        上記の内容に同意します
+      </label>
+    </section>
+
+    <div class="flex gap-3">
+      <button onclick="goToPage('menu')" class="w-1/3 bg-white border border-stone-200 text-stone-500 font-bold py-3.5 rounded-full">もどる</button>
+      <button id="consultSubmitBtn" onclick="submitConsult()" class="w-2/3 bg-mint-500 hover:bg-mint-600 text-white font-bold py-3.5 rounded-full shadow-soft">この内容で送る</button>
+    </div>
+  </main>
+
   <!-- ============ PAGE: ADMIN ============ -->
   <main id="page-admin" class="page px-5 pt-5 space-y-5">
     <section class="soft-card p-5">
@@ -460,7 +601,7 @@
         <span class="tab-icon-wrap w-9 h-9 rounded-full flex items-center justify-center transition"><i data-lucide="house" class="w-5 h-5"></i></span>
         ホーム
       </button>
-      <button onclick="goToPage('reserve')" class="tab-btn flex flex-col items-center gap-1 px-6 py-1.5 text-[11px] text-stone-400 font-semibold" data-tab="reserve">
+      <button onclick="goToPage('menu')" class="tab-btn flex flex-col items-center gap-1 px-6 py-1.5 text-[11px] text-stone-400 font-semibold" data-tab="menu">
         <span class="tab-icon-wrap w-9 h-9 rounded-full flex items-center justify-center transition"><i data-lucide="calendar-heart" class="w-5 h-5"></i></span>
         予約
       </button>
@@ -581,10 +722,12 @@ function goToPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-  const tabBtn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
+  const tabName = (name === 'reserve' || name === 'consult') ? 'menu' : name;
+  const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
   if (tabBtn) tabBtn.classList.add('active-tab');
 
   if (name === 'reserve') { resetReservationForm(); }
+  if (name === 'consult') { resetConsultForm(); }
   if (name === 'admin') { renderAdmin(); }
   window.scrollTo({top:0, behavior:'smooth'});
   lucide.createIcons();
@@ -1175,12 +1318,148 @@ function showAdminDayDetail(y, m, day) {
   `;
 }
 
+/* ---------------- 個別相談（日時リクエスト） ---------------- */
+const CONSULT_TIME_BANDS = ['10:00〜12:00', '12:00〜14:00', '14:00〜16:00', '16:00以降（オンラインのみ）', '時間はおまかせ'];
+let consultStyle = null;   // 'online' | 'face'
+let consultTopics = [];
+
+function renderWishList() {
+  const today = isoOf(new Date());
+  const wrap = document.getElementById('wishList');
+  wrap.innerHTML = [1, 2, 3].map(n => `
+    <div class="flex gap-2 items-center">
+      <span class="w-14 flex-shrink-0 text-[11px] font-bold ${n === 1 ? 'text-pink-500' : 'text-stone-400'}">第${n}希望${n === 1 ? '<br><span class="text-pink-400 font-normal">必須</span>' : ''}</span>
+      <input type="date" id="wishDate${n}" min="${today}" onchange="checkWishWeekday()" class="flex-1 min-w-0 border border-stone-200 rounded-xl px-2 py-2 text-[13px]">
+      <select id="wishTime${n}" class="w-[38%] border border-stone-200 rounded-xl px-2 py-2 text-[12px] bg-white">
+        ${CONSULT_TIME_BANDS.map(t => `<option value="${t}">${t}</option>`).join('')}
+      </select>
+    </div>
+  `).join('');
+}
+
+// 対面で土日を選んだときは「ご相談」になることを、やさしくお知らせする
+function checkWishWeekday() {
+  const hint = document.getElementById('wishHint');
+  const hasWeekend = [1, 2, 3].some(n => {
+    const v = document.getElementById('wishDate' + n).value;
+    if (!v) return false;
+    const day = isoToDate(v).getDay();
+    return day === 0 || day === 6;
+  });
+  hint.textContent = (consultStyle === 'face' && hasWeekend)
+    ? '対面の土日祝は、ご希望をうかがってから調整いたします。そのまま送っていただいて大丈夫です。'
+    : '第1希望だけでも大丈夫です。';
+}
+
+function wishLabel(n) {
+  const v = document.getElementById('wishDate' + n).value;
+  if (!v) return '';
+  const d = isoToDate(v);
+  const time = document.getElementById('wishTime' + n).value;
+  return `第${n}希望：${d.getMonth() + 1}/${d.getDate()}（${WEEKDAY_LABELS[d.getDay()]}）${time}`;
+}
+
+function resetConsultForm() {
+  consultStyle = null;
+  consultTopics = [];
+  document.querySelectorAll('.style-btn, .con-topic').forEach(b => b.classList.remove('selected'));
+  ['conName', 'conEmail', 'conPhone', 'conMemo'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('conLineGift').checked = false;
+  document.getElementById('conAgree').checked = false;
+  renderWishList();
+  checkWishWeekday();
+}
+
+document.addEventListener('click', (e) => {
+  const styleBtn = e.target.closest('.style-btn');
+  if (styleBtn) {
+    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
+    styleBtn.classList.add('selected');
+    consultStyle = styleBtn.dataset.val;
+    checkWishWeekday();
+  }
+  const topicBtn = e.target.closest('.con-topic');
+  if (topicBtn) {
+    topicBtn.classList.toggle('selected');
+    const v = topicBtn.dataset.val;
+    consultTopics = topicBtn.classList.contains('selected')
+      ? [...consultTopics, v]
+      : consultTopics.filter(t => t !== v);
+  }
+});
+
+async function submitConsult() {
+  const name = document.getElementById('conName').value.trim();
+  const email = document.getElementById('conEmail').value.trim();
+  const phone = document.getElementById('conPhone').value.trim();
+  const memoText = document.getElementById('conMemo').value.trim();
+  const lineGift = document.getElementById('conLineGift').checked;
+  const wishes = [1, 2, 3].map(wishLabel).filter(Boolean);
+
+  const missing = [];
+  if (!consultStyle) missing.push('ご相談の形（オンライン・対面）');
+  if (!wishes.length) missing.push('ご希望の日時（第1希望）');
+  if (!name) missing.push('お名前');
+  if (!email && !phone) missing.push('連絡先（メールアドレスか電話番号）');
+  if (missing.length) {
+    alert('次の項目をご入力ください。\n\n・' + missing.join('\n・'));
+    return;
+  }
+  if (!document.getElementById('conAgree').checked) {
+    alert('ご案内の内容をご確認のうえ、「同意します」にチェックを入れてください。');
+    return;
+  }
+
+  const styleLabel = consultStyle === 'online' ? 'オンライン' : '対面';
+  const desired = `【個別相談・${styleLabel}】\n${wishes.join('\n')}`;
+  const memo = [
+    `料金：${lineGift ? 'LINE特典 初回3,000円（登録日をご確認ください）' : '初回5,000円'}`,
+    `気になるテーマ：${consultTopics.join('、') || 'なし'}`,
+    `ご相談内容：${memoText || '未記入'}`
+  ].join('\n');
+
+  const btn = document.getElementById('consultSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信しています…';
+
+  const outcome = await sendToGoogleSheet({
+    type: 'inquiry',
+    name, phone, email, desired, memo,
+    createdAt: new Date().toISOString()
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'この内容で送る';
+
+  if (outcome === 'offline') {
+    alert('送信できませんでした。通信環境をご確認のうえ、もう一度お試しください。');
+    return;
+  }
+  if (outcome === 'error') {
+    alert('送信中にエラーが発生しました。お手数ですが、下の内容をそのまま担当者にお伝えください。\n\n' + lastGasErrorMessage);
+    return;
+  }
+
+  document.getElementById('modalTitle').textContent = 'ご予約のリクエストを受け付けました！';
+  document.getElementById('modalDetail').textContent =
+    'ご希望の日時を確認して、丸岡から日時を確定するご連絡をいたします。少しだけお待ちくださいね。';
+  document.getElementById('reminderNote').textContent = email
+    ? 'ご入力いただいたメールアドレスに、受付メールをお送りしました。'
+    : 'お電話にてご連絡させていただきます。';
+  document.getElementById('successModal').style.display = 'flex';
+  lucide.createIcons();
+}
+
 /* ---------------- init ---------------- */
 window.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
   renderDateList();
   renderSlotList();
   updateStep1Button();
+  renderWishList();
+  // LINEのリッチメニューなどから、#consult・#menu・#reserve で直接そのページを開けるようにする
+  const hashPage = location.hash.replace('#', '');
+  if (['menu', 'consult', 'reserve'].includes(hashPage)) goToPage(hashPage);
 });
 </script>
 </body>
